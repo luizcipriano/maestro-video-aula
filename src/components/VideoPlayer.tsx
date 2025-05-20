@@ -27,20 +27,13 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, title }) => {
                    src.includes('player.vimeo.com');
 
     // Create video element or use existing container for embeds
-    let playerElement = videoRef.current;
-
     if (!isEmbed) {
       // Create a video element for direct video files
-      const videoElement = document.createElement('video');
-      videoElement.controls = true;
-      videoElement.src = src;
-      
-      // Clear the container and append the video element
-      while (playerElement.firstChild) {
-        playerElement.removeChild(playerElement.firstChild);
-      }
-      playerElement.appendChild(videoElement);
-      playerElement = videoElement;
+      videoRef.current.innerHTML = `
+        <video controls>
+          <source src="${src}" type="video/mp4">
+        </video>
+      `;
     } else {
       // For embeds, we'll use the div as a container
       videoRef.current.innerHTML = `
@@ -60,7 +53,16 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, title }) => {
       ]
     };
     
-    plyrInstance.current = new Plyr(playerElement, options);
+    // Use the correct selector to initialize Plyr
+    if (videoRef.current) {
+      const videoElement = isEmbed ? 
+        videoRef.current.querySelector('iframe') : 
+        videoRef.current.querySelector('video');
+        
+      if (videoElement) {
+        plyrInstance.current = new Plyr(videoElement, options);
+      }
+    }
 
     // Clean up on component unmount
     return () => {
