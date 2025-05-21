@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { AuthState, LoginCredentials, RegisterData, User, UserRole } from '@/types/auth';
 
@@ -27,6 +26,7 @@ interface AuthContextType {
   login: (credentials: LoginCredentials) => Promise<boolean>;
   register: (data: RegisterData) => Promise<boolean>;
   logout: () => void;
+  loginWithGoogle: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -127,8 +127,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  // New Google login function
+  const loginWithGoogle = async (): Promise<boolean> => {
+    // This is a mock implementation for demonstration
+    // In a real app, you would use a Google OAuth provider
+    console.log("Attempting Google login");
+    
+    // Simulate successful Google login with mock user data
+    const googleUser = {
+      id: 'google-user-123',
+      name: 'Google User',
+      email: 'google.user@example.com',
+      role: 'aluno' as UserRole,
+      createdAt: new Date().toISOString()
+    };
+    
+    // Store user data and update auth state
+    localStorage.setItem('musicaAulasUser', JSON.stringify(googleUser));
+    
+    setAuthState({
+      user: googleUser,
+      isAuthenticated: true,
+      isLoading: false
+    });
+    
+    return true;
+  };
+
   return (
-    <AuthContext.Provider value={{ authState, login, register, logout }}>
+    <AuthContext.Provider value={{ authState, login, register, logout, loginWithGoogle }}>
       {children}
     </AuthContext.Provider>
   );

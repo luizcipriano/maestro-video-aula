@@ -7,12 +7,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { Separator } from '@/components/ui/separator';
+import { GoogleIcon } from '@/components/icons/GoogleIcon';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const { login, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -56,6 +59,35 @@ const Login = () => {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    try {
+      setIsGoogleLoading(true);
+      const success = await loginWithGoogle();
+      
+      if (success) {
+        toast({
+          title: "Login com Google realizado",
+          description: "Bem-vindo à MúsicaAulas!",
+        });
+        navigate('/');
+      } else {
+        toast({
+          title: "Falha no login com Google",
+          description: "Ocorreu um erro ao tentar fazer login com Google.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Erro no login com Google",
+        description: "Ocorreu um erro ao tentar fazer login com Google.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+
   // Demonstration credentials
   const loginAsProfessor = () => {
     setEmail('joao@example.com');
@@ -76,7 +108,23 @@ const Login = () => {
             Entre para acessar sua conta
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          <Button 
+            variant="outline" 
+            className="w-full flex items-center justify-center gap-2"
+            onClick={handleGoogleLogin}
+            disabled={isGoogleLoading}
+          >
+            <GoogleIcon />
+            {isGoogleLoading ? "Conectando..." : "Entrar com Google"}
+          </Button>
+          
+          <div className="flex items-center gap-2">
+            <Separator className="flex-grow" />
+            <span className="text-xs text-muted-foreground">OU</span>
+            <Separator className="flex-grow" />
+          </div>
+          
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>

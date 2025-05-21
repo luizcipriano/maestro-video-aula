@@ -25,16 +25,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, title }) => {
                    src.includes('youtu.be') || 
                    src.includes('vimeo.com') || 
                    src.includes('player.vimeo.com');
+                   
+    // Check if it's an object URL (from file upload)
+    const isObjectUrl = src.startsWith('blob:');
 
     // Create video element or use existing container for embeds
-    if (!isEmbed) {
-      // Create a video element for direct video files
-      videoRef.current.innerHTML = `
-        <video controls>
-          <source src="${src}" type="video/mp4">
-        </video>
-      `;
-    } else {
+    if (isEmbed) {
       // For embeds, we'll use the div as a container
       videoRef.current.innerHTML = `
         <iframe
@@ -42,6 +38,13 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, title }) => {
           allowfullscreen
           allow="autoplay"
         ></iframe>
+      `;
+    } else {
+      // For direct video files (including object URLs)
+      videoRef.current.innerHTML = `
+        <video controls>
+          <source src="${src}" type="video/mp4">
+        </video>
       `;
     }
 
